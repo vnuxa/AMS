@@ -9,11 +9,11 @@ client:on("ready", function() -- bot is ready
 end)
 
 local handler = require("./Handler.lua")
-handler.Setup:Init(
+handler.Setup(discordia,client):Init(
 	{
 		"./Modules/ModerationLib.lua",
 	})
-
+--[[
 client:on("messageCreate", function(message)
 
 	local content = message.content
@@ -51,8 +51,8 @@ client:on("messageCreate", function(message)
     print(require("./Modules/test.lua"))
   end
 end)
+]]
 
-
-client:run("Bot MTA3MTg0Mzc0NDQ4OTQxODgyMw.GAMqNr.YB6LtgyfmJcm2AcrR0lrR7ouk25yi37qAtds38") -- replace BOT_TOKEN with your bot token
+client:run("Bot ".. os.getenv("TOKEN")) -- replace BOT_TOKEN with your bot token
 --local keep_alive = require("./keepalive.py")
 --keepalive()

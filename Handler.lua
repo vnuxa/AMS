@@ -1,6 +1,6 @@
 local module = {}
 
-function module.Setup()
+function module.Setup(discordia,client)
     local lib = {}
 
     function lib:Init(paths)
