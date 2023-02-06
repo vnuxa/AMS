@@ -3,12 +3,8 @@ local module = {}
 function module:Init(discordia,client)
     local lib = {}
 
-    function lib:GetUserFromString(guild,arg)
-        local members = guild.members 
-        guild.requestMembers()
-        for i,member in pairs(members) do 
-            print("Members:", i,member.name)
-        end
+    function lib:GetUserFromStringID(guild,arg)
+        return guild:getMember(arg)
     end
     
 

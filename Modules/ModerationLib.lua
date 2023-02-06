@@ -10,7 +10,10 @@ function mysplit (inputstr, sep)
     end
     return t
  end
-
+function wait(seconds)
+  local start = os.time()
+  repeat until os.time() > start + seconds
+end
 function module:Init(discordia,client)
    local libs = {}
    libs.user = require("./Libraries/userLib.lua"):Init(discordia,client)
@@ -25,11 +28,11 @@ function module:Init(discordia,client)
     client:on("messageCreate", function(message)
         if message.author == client.user then return end
         local args = mysplit(string.lower(message.content))
-        for i,v in pairs(args) do print("Args:",i,v) end 
         if args[1] == "-warn" then 
-          local testString = "Command is still WIP (Also got user",args[2],")"
+            local member = libs.user:GetUserFromStringID(message.guild,args[2])
+            local testString = "Found user"..   member.name
             message:reply(testString)
-            libs.user:GetUserFromString(message.guild,args[2])
+            
         end
     end) 
 end
