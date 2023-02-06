@@ -12,6 +12,8 @@ function mysplit (inputstr, sep)
  end
 
 function module:Init(discordia,client)
+   local libs = {}
+   libs.user = require("Libraries/userLib.lua"):Init(discordia,client)
    -- local intrType = discordia.enums.interactionType
     --local slashClient = dia.Client():useApplicationCommands()
     
@@ -25,8 +27,9 @@ function module:Init(discordia,client)
         local args = mysplit(string.lower(message.content))
         for i,v in pairs(args) do print("Args:",i,v) end 
         if args[1] == "-warn" then 
-          local testString = "Command is still WIP (Also got user",tostring(args[2]),")"
+          local testString = "Command is still WIP (Also got user",args[2],")"
             message:reply(testString)
+            libs.user:GetUserFromString(message.guild,args[2])
         end
     end) 
 end
