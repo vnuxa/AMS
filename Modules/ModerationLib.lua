@@ -21,7 +21,7 @@ function module:Init(discordia,client)
     end)
     ]]
     client:on("messageCreate", function(message)
-        --make sure bot didnt create the message
+        if message.author == client.user then return end
         local args = mysplit(string.lower(message.content))
         for i,v in pairs(args) do print("Args:",i,v) end 
         if args[1] == "-warn" then 
