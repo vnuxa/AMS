@@ -13,7 +13,7 @@ function mysplit (inputstr, sep)
 
 function module:Init(discordia,client)
    local libs = {}
-   libs.user = require("Libraries/userLib.lua"):Init(discordia,client)
+   libs.user = require("./Libraries/userLib.lua"):Init(discordia,client)
    -- local intrType = discordia.enums.interactionType
     --local slashClient = dia.Client():useApplicationCommands()
     
