@@ -5,6 +5,7 @@ function module:Init(discordia,client)
 
     function lib:GetUserFromString(guild,arg)
         local members = guild.members 
+        guild.requestMembers()
         for i,member in pairs(members) do 
             print("Members:", i,member.name)
         end
