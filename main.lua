@@ -1,9 +1,18 @@
 local discordia = require("discordia")
+require("discordia-interactions") -- Modifies Discordia and adds interactionCreate event
 local client = discordia.Client()
+local intrType = discordia.enums.interactionType
+
 
 client:on("ready", function() -- bot is ready
 	print("Logged in as " .. client.user.username)
 end)
+
+local handler = require("./Handler.lua")
+handler.Setup:Init(
+	{
+		"./Modules/ModerationLib.lua",
+	})
 
 client:on("messageCreate", function(message)
 
