@@ -26,3 +26,33 @@
 2023-02-06 12:54:44 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
 2023-02-06 12:54:44 | [INFO]    | Shard 0 : Received HELLO
 2023-02-06 12:54:44 | [INFO]    | Shard 0 : Received READY
+2023-02-06 17:34:21 | [INFO]    | Discordia 2.11.2
+2023-02-06 17:34:21 | [INFO]    | Connecting to Discord...
+2023-02-06 17:34:21 | [ERROR]   | Could not authenticate, check token: /home/runner/AMS/deps/coro-http.lua:75: Error verifying peer: unable to get local issuer certificate
+2023-02-06 17:34:52 | [INFO]    | Discordia 2.11.2
+2023-02-06 17:34:52 | [INFO]    | Connecting to Discord...
+2023-02-06 17:34:52 | [ERROR]   | Could not authenticate, check token: /home/runner/AMS/deps/coro-http.lua:75: Error verifying peer: unable to get local issuer certificate
+2023-02-06 17:38:59 | [INFO]    | Discordia 2.11.2
+2023-02-06 17:38:59 | [INFO]    | Connecting to Discord...
+2023-02-06 17:38:59 | [ERROR]   | Could not authenticate, check token: /home/runner/AMS/deps/coro-http.lua:75: Error verifying peer: unable to get local issuer certificate
+2023-02-06 17:40:14 | [INFO]    | Discordia 2.11.2
+2023-02-06 17:40:14 | [INFO]    | Connecting to Discord...
+2023-02-06 17:40:14 | [INFO]    | Authenticated as CRI | AMS#7521
+2023-02-06 17:40:14 | [INFO]    | Launching shard 0 (1 out of 1)...
+2023-02-06 17:40:14 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2023-02-06 17:40:14 | [INFO]    | Shard 0 : Received HELLO
+2023-02-06 17:40:14 | [INFO]    | Shard 0 : Received READY
+2023-02-06 17:40:57 | [INFO]    | Discordia 2.11.2
+2023-02-06 17:40:57 | [INFO]    | Connecting to Discord...
+2023-02-06 17:40:57 | [INFO]    | Authenticated as CRI | AMS#7521
+2023-02-06 17:40:57 | [INFO]    | Launching shard 0 (1 out of 1)...
+2023-02-06 17:40:57 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2023-02-06 17:40:57 | [INFO]    | Shard 0 : Received HELLO
+2023-02-06 17:40:57 | [INFO]    | Shard 0 : Received READY
+2023-02-06 17:41:48 | [INFO]    | Discordia 2.11.2
+2023-02-06 17:41:48 | [INFO]    | Connecting to Discord...
+2023-02-06 17:41:48 | [INFO]    | Authenticated as CRI | AMS#7521
+2023-02-06 17:41:48 | [INFO]    | Launching shard 0 (1 out of 1)...
+2023-02-06 17:41:48 | [INFO]    | Shard 0 : Connected to wss://gateway.discord.gg
+2023-02-06 17:41:48 | [INFO]    | Shard 0 : Received HELLO
+2023-02-06 17:41:48 | [INFO]    | Shard 0 : Received READY

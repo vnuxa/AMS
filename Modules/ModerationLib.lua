@@ -1,5 +1,5 @@
 local module = {}
-local dcmd = require("discordia-commands")
+--local dcmd = require("discordia-commands")
 function mysplit (inputstr, sep)
     if sep == nil then
        sep = "%s"
@@ -12,8 +12,8 @@ function mysplit (inputstr, sep)
  end
 
 function module:Init(discordia,client)
-    local intrType = discordia.enums.interactionType
-    local slashClient = dia.Client():useApplicationCommands()
+   -- local intrType = discordia.enums.interactionType
+    --local slashClient = dia.Client():useApplicationCommands()
     
     --[[
     CLIENT:on("slashCommand", function(ia, cmd, args)
@@ -21,10 +21,12 @@ function module:Init(discordia,client)
     end)
     ]]
     client:on("messageCreate", function(message)
+        --make sure bot didnt create the message
         local args = mysplit(string.lower(message.content))
         for i,v in pairs(args) do print("Args:",i,v) end 
         if args[1] == "-warn" then 
-            message:Reply("Command is still WIP (Also got user",tostring(args[2]),")")
+          local testString = "Command is still WIP (Also got user",tostring(args[2]),")"
+            message:reply(testString)
         end
     end) 
 end

@@ -1,11 +1,11 @@
 local module = {}
 
-function module.Setup(discordia,client)
+function module:Setup(discordia,client)
     local lib = {}
 
     function lib:Init(paths)
         for i,v in pairs(paths) do 
-            require(v):Setup(discordia,client)
+            require(v):Init(discordia,client)
         end
     end
     --Initialize libraries
