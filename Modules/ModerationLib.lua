@@ -25,7 +25,7 @@ function module:Init(discordia,client)
 
     end)
     ]]
-    lib.perms = {}
+    libs.perms = {}
     function libs.perms:FullCheck(member,perm)
         
       local hasPerm = libs.user:CheckDiscordPermission(member,perm)  
