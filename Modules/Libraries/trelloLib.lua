@@ -1,8 +1,20 @@
 local module = {}
 local http = require('coro-http')
 local json = require("json")
+function httpEncode(text) -- thanks to wiremod
+    local ndata = string.gsub(text, "[^%w _~%.%-]", function(str)
+        local nstr = string.format("%X", string.byte(str))
+        return "%"..((string.len(nstr) == 1) and "0" or "")..nstr
+    end)
+    return (string.gsub(ndata, " ", "+"))
+end
+
+function httpDecode(s) -- https://www.lua.org/pil/20.3.html
+    return s:gsub("+", " "):gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end)
+end
 
 function module:Init(discordia,client)
+    --                                    WHEN DEBUGGING MAKE SURE THAT THE PROPRETIES TABLE IS SENT WITHIN THE URL!!!!
     local lib = {}
     local Key = os.getenv("TrelloKey")
     local Token = os.getenv("TrelloToken")
@@ -11,8 +23,8 @@ function module:Init(discordia,client)
     
     local function urlRequest(method,url,body,headers,options)
         local response,body = http.request(method,url,headers,body,options)
-        if res.code < 200 or res.code >= 300 then
-            print("Request failed, reason: " .. res.reason); 
+        if response.code < 200 or response.code >= 300 then
+            print("Request failed, reason: " .. response.reason,body); 
             return nil
         end
         return json.decode(body)
@@ -22,6 +34,10 @@ function module:Init(discordia,client)
     function lib.Boards:GetLabelsOnBoard(BoardId)
         if BoardId then else print("Board ID not found") end
         return urlRequest("GET","https://api.trello.com/1/boards/" .. BoardId .. "/labels" .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken)
+    end
+    function lib.Boards:GetCardsOnBoard(BoardId)
+        if BoardId then else print("Board ID not found") end
+        return urlRequest("GET","https://api.trello.com/1/boards/" .. BoardId .. "/cards" .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken)
     end
     function lib.Boards:GetCardOnBoard(BoardId,CardName)
         if BoardId then else print("Board ID not found") end
@@ -39,17 +55,18 @@ function module:Init(discordia,client)
                 end)
     
                 if not Succ then
-                    warn("[SERVER] BoardsAPI • [GetCardOnBoard] : ", Err)
+                    print("[SERVER] BoardsAPI • [GetCardOnBoard] : ", Err)
                     return false
                 else
                     return Response
                 end
             else
-                warn("[SERVER] BoardsAPI • [GetCardOnBoard] : Card Not Found.")
+                print("[SERVER] BoardsAPI • [GetCardOnBoard] : Card Not Found.")
                 return false
             end	
         end	
     end
+    
     function lib.Boards:GetListsOnBoard(BoardId)
         if BoardId then else print("Board ID not found") end
         return urlRequest("GET","https://api.trello.com/1/boards/" .. BoardId .. "/lists?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken)
@@ -79,6 +96,19 @@ function module:Init(discordia,client)
         if ListId then else print("List ID not found") end
         return urlRequest("GET","https://api.trello.com/1/lists/" .. ListId .. "/cards?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken)
     end
+    function lib.Cards:GetCardOnList(ListId,CardName)
+        if CardName then else print("Card Name not found") end
+
+        local CardID
+        local Cards = lib.Cards:GetCardsOnList(ListId)
+        for _,Data in pairs(Cards) do
+            if CardName == Data.name then
+                return Data
+            end	
+        end	
+        print("Card not found")
+        return false
+    end
     function lib.Cards:CreateListOnBoard(ListId, Name)
         if ListId then else print("List ID not found") end
         if Name then else print("Name not found") end
@@ -96,7 +126,7 @@ function module:Init(discordia,client)
         if ListId then else print("List ID not found") end
         if Name then else print("Name not found") end
         if not BoardOptionalData then
-            BoardOptionalData = {}
+            --BoardOptionalData = {}
         end
 
 	    local DataToSend = {
@@ -104,7 +134,20 @@ function module:Init(discordia,client)
             ["idLabels"] = BoardOptionalData.idLabels or nil,
             ["AttachmentLink"] = BoardOptionalData.AttachmentLink or nil
         }
-        local body = urlRequest("POST","https://api.trello.com/1/cards" .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken, json.encode({name = Name, desc = DataToSend.Description, idList = ListId, idLabels = DataToSend.idLabels,urlSource = DataToSend.AttachmentLink}))
+        local updateUrl = ""
+        local num = 1
+        for i,v in pairs({name = Name, desc = DataToSend.Description, idList = ListId, idLabels = DataToSend.idLabels,urlSource = DataToSend.AttachmentLink}) do 
+            if num == 1 then 
+                num = num + 1
+                updateUrl = i.."=".. httpEncode(tostring(v))
+            else 
+                updateUrl = updateUrl .."&"..i.."=".. httpEncode(tostring(v))
+            end
+        end
+        print("new update url",updateUrl)
+        print("https://api.trello.com/1/cards" .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken,"&".. updateUrl)
+        local body = urlRequest("POST",
+        "https://api.trello.com/1/cards" .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken.."&".. updateUrl)
         if body then return true end  
         return false 
     end
@@ -120,11 +163,24 @@ function module:Init(discordia,client)
             ["idLabels"] = BoardOptionalData.idLabels or nil, 
             ['idList'] = BoardOptionalData.idList
         }
+        for i,v in pairs(DataToSend) do 
+            print("Data index:",i,"value",v)
+        end
+        local updateUrl = ""
+        local num = 1
+        for i,v in pairs(DataToSend) do 
+            if num == 1 then 
+                num = num + 1
+                updateUrl = i.."=".. httpEncode(tostring(v))
+            else 
+                updateUrl = updateUrl .."&"..i.."=".. httpEncode(tostring(v))
+            end
+        end
         local body = urlRequest(
             "PUT", -- Method
-            "https://api.trello.com/1/cards/" .. CardId .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken, --URL
-            json.encode(DataToSend), --Body
-            {["Content-Type"] = "application/json"}, --Headers
+            "https://api.trello.com/1/cards/" .. CardId .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken.."&".. updateUrl, --URL
+            nil,
+            {["Content-Type"] = "application/json"} --Headers
         )
         if body then return true end  
         return false 
@@ -133,7 +189,7 @@ function module:Init(discordia,client)
         if CardId then else print("Card ID not found") end
         local body = urlRequest(
             "DELETE", -- Method
-            "https://api.trello.com/1/cards/" .. CardId .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken, --URL
+            "https://api.trello.com/1/cards/" .. CardId .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken --URL
         )
     end
     function lib.Cards:GetAttachmentsOnCard(CardId)
@@ -145,7 +201,7 @@ function module:Init(discordia,client)
         local body = urlRequest(
             "POST", -- Method
             "https://api.trello.com/1/cards/" .. CardId .. "/attachments?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken, --URL
-            json.encode({id = CardId, url = AttachmentUrl}), --Body
+            json.encode({id = CardId, url = AttachmentUrl}) --Body
         )
         if body then return true end  
         return false 
@@ -155,7 +211,7 @@ function module:Init(discordia,client)
         if Attachmentid then else print("Attachment ID not found") end
         local body = urlRequest(
             "DELETE", -- Method
-            "https://api.trello.com/1/cards/" .. CardId .. "/attachments/" .. Attachmentid .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken, --URL
+            "https://api.trello.com/1/cards/" .. CardId .. "/attachments/" .. Attachmentid .. "?key=" .. TrelloAPIKey .. "&token=" .. TrelloToken --URL
         )
     end
     return lib

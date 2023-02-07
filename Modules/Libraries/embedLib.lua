@@ -42,7 +42,25 @@ function module:Init(discordia,client)
         }
         return embed
     end
+    function lib:informationEmbed(changeTable)
+        local embed = {
+                title = changeTable["title"] or "",
+				description =changeTable["description"] or "",
+				author = {
+					name = changeTable["authorName"],
+					icon_url = "http://msafe.i0.tf/bneNm.png"
+				},
+				fields = changeTable["fields"],
+				footer = {
+					text = "Autonomous Systems Manager • ".. os.date ("%A, %m %B %Y, %H:%M"),
+                    icon_url = "https://cdn.discordapp.com/attachments/1066061560688156672/1066061689352638614/CRI_Main_Grey.png"
+				},
+				color = 0x518BFF, -- hex color code
+        }
+        return embed
+    end
     
+
     return lib
 end
 
