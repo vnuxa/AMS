@@ -18,6 +18,7 @@ function module:Init(discordia,client)
    local libs = {}
    libs.user = require("./Libraries/userLib.lua"):Init(discordia,client)
    libs.embed = require("./Libraries/embedLib.lua"):Init(discordia,client)
+   libs.trello = require("./Libraries/trelloLib.lua"):Init(discordia,client)
    -- local intrType = discordia.enums.interactionType
     --local slashClient = dia.Client():useApplicationCommands()
     
@@ -52,24 +53,52 @@ function module:Init(discordia,client)
             local member = message.mentionedUsers.first
             --Checking HC permissions
             if libs.user:CheckDiscordPermission(author,"hc") then else
-                message:reply("You do not have high command permissions.") 
+                message:reply{embeds = {
+                    libs.embed:errorEmbed({
+                        authorName = "Couldn't complete action",
+                        description = "You are missing `HC` permissions. If you believe this is a mistake please contact the advisory team",
+                    })
+                }}
                 return 
             end
             --Getting user
             local user = libs.perms:GetUser(message,args[2])
-            if user then else return end
-
-            local testString = "User: "..   user.name .. " Note: ".. args[3]
-            local embedString = libs.embed:verifiedEmbed({
-                authorName = "Note saved",
-                description = "Your note of this user has been saved (he lies saving is WIP)"
-                fields = {
-                    {name = "Note information",value = "``"..args[3].."``"}
-                }
+            if user then else 
+                message:reply{embeds = {
+                libs.embed:errorEmbed({
+                    authorName = "Couldn't complete action",
+                    description = "User `".. user.name .."` has not been found"
+                })
+            }} return end
+            local boardId = "63e27f477168890c41e40eb1"
+            local card = libs.trello.Boards:GetCardOnBoard(boardId,user.name)
+            if card then else 
+                message:reply{embeds = {
+                    libs.embed:errorEmbed({
+                        authorName = "Couldn't complete action",
+                        description = "User `".. user.name .."` has not been found"
+                    })
+                }}
+                return 
+            end
+            local updateCard = libs.trello.Cards:UpdateCard(card.id,
+            {
+                ["desc"] = args[3]
             })
-            message:reply(testString)
-            
+            print("The update status is",updateCard)
+            message:reply{embeds = {
+                libs.embed:verifiedEmbed({
+                    authorName = "Note saved",
+                    description = "Your note of `".. user.name .."` has been saved",
+                    fields = {
+                        {name = "Note information",value = "``"..args[3].."``"},
+                    },
+                })
+            }}
+
         end
+        
+
     end) 
 end
 
