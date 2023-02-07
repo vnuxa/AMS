@@ -17,6 +17,7 @@ end
 function module:Init(discordia,client)
    local libs = {}
    libs.user = require("./Libraries/userLib.lua"):Init(discordia,client)
+   libs.embed = require("./Libraries/embedLib.lua"):Init(discordia,client)
    -- local intrType = discordia.enums.interactionType
     --local slashClient = dia.Client():useApplicationCommands()
     
@@ -50,7 +51,7 @@ function module:Init(discordia,client)
             local author = message.guild:getMember(message.author.id)
             local member = message.mentionedUsers.first
             --Checking HC permissions
-            if libs.user:CheckDiscordPermission(author,"hc") then  
+            if libs.user:CheckDiscordPermission(author,"hc") then else
                 message:reply("You do not have high command permissions.") 
                 return 
             end
@@ -58,7 +59,14 @@ function module:Init(discordia,client)
             local user = libs.perms:GetUser(message,args[2])
             if user then else return end
 
-            local testString = "User: "..   user.name .. "Note: ".. args[3]
+            local testString = "User: "..   user.name .. " Note: ".. args[3]
+            local embedString = libs.embed:verifiedEmbed({
+                authorName = "Note saved",
+                description = "Your note of this user has been saved (he lies saving is WIP)"
+                fields = {
+                    {name = "Note information",value = "``"..args[3].."``"}
+                }
+            })
             message:reply(testString)
             
         end
