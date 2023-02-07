@@ -25,12 +25,40 @@ function module:Init(discordia,client)
 
     end)
     ]]
+    lib.perms = {}
+    function libs.perms:FullCheck(member,perm)
+        
+      local hasPerm = libs.user:CheckDiscordPermission(member,perm)  
+
+    end
+    function libs.perms:GetUser(message,argument)
+        local id = argument:match('^<@!?(%d+)>$')
+        -- Confirm the caller mentioned a valid user.
+        local user
+        if id then 
+            user = client:getUser(id)
+        else 
+            user = client:getUser(argument)
+        end
+        if user then else message:reply("Member not found, no valid ID or mention.") return nil end 
+        return user 
+    end
     client:on("messageCreate", function(message)
         if message.author == client.user then return end
         local args = mysplit(string.lower(message.content))
-        if args[1] == "-warn" then 
-            local member = libs.user:GetUserFromStringID(message.guild,args[2])
-            local testString = "Found user"..   member.name
+        if args[1] == "-note" then 
+            local author = message.guild:getMember(message.author.id)
+            local member = message.mentionedUsers.first
+            --Checking HC permissions
+            if libs.user:CheckDiscordPermission(author,"hc") then  
+                message:reply("You do not have high command permissions.") 
+                return 
+            end
+            --Getting user
+            local user = libs.perms:GetUser(message,args[2])
+            if user then else return end
+
+            local testString = "User: "..   user.name .. "Note: ".. args[3]
             message:reply(testString)
             
         end
