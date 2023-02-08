@@ -36,7 +36,7 @@ function module:Init(discordia,client)
     lib.User = {}
     function lib.User:GetIDFromName(Name) --https://api.roblox.com/users/get-by-username?username=
         if Name then else print("Put a valid name") return nil end
-        return urlRequest("GET","https://api.roblox.com/users/get-by-username?username="..Name)
+        return urlRequest("GET","https://api.roblox.com/users/get-by-username?username="..Name).Id
     end
     function lib.User:GetThumbnail(UserID)
         if UserID then else print("Put a valid ID") return nil end
@@ -46,7 +46,7 @@ function module:Init(discordia,client)
         if UserID and GroupId then else print("Put a valid ID") return nil end
         local response = urlRequest("GET","https://groups.roblox.com/v1/users/".. UserID .."/groups/roles")
         if response then else print("User id invalid or is in no groups") end 
-        for i,data in pairs(response) do 
+        for i,data in pairs(response.data) do 
             if data["group"]["id"] == GroupId then 
                 return data
             end

@@ -21,6 +21,7 @@ function module:Init(discordia,client)
 					text = "Autonomous Systems Manager • ".. os.date ("%A, %m %B %Y, %H:%M"),
                     icon_url = "https://cdn.discordapp.com/attachments/1066061560688156672/1066061689352638614/CRI_Main_Grey.png"
 				},
+                thumbnail = changeTable["thumbnail"],
 				color = 0x6ce754, -- hex color code
         }
         return embed
@@ -38,6 +39,7 @@ function module:Init(discordia,client)
 					text = "Autonomous Systems Manager • ".. os.date ("%A, %m %B %Y, %H:%M"),
                     icon_url = "https://cdn.discordapp.com/attachments/1066061560688156672/1066061689352638614/CRI_Main_Grey.png"
 				},
+                thumbnail = changeTable["thumbnail"],
 				color = 0xff5454, -- hex color code
         }
         return embed
@@ -55,6 +57,7 @@ function module:Init(discordia,client)
 					text = "Autonomous Systems Manager • ".. os.date ("%A, %m %B %Y, %H:%M"),
                     icon_url = "https://cdn.discordapp.com/attachments/1066061560688156672/1066061689352638614/CRI_Main_Grey.png"
 				},
+                thumbnail = changeTable["thumbnail"],
 				color = 0x518BFF, -- hex color code
         }
         return embed
