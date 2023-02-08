@@ -148,7 +148,7 @@ function module:Init(discordia,client)
                         description = "Invalid Unix epoch time. If you do not know how to get epoch time [click here](https://www.epochconverter.com)."
                     })
                 }}
-                return end 
+                return  
             end
             if card then 
                 local updateCard = libs.trello.Cards:UpdateCard(card.id,
@@ -170,10 +170,10 @@ function module:Init(discordia,client)
                 print(card)
                 message:reply{embeds = {
                     libs.embed:verifiedEmbed({
-                        authorName = "Note saved",
-                        description = "Your note of `".. user.name .."` has been saved",
+                        authorName = "User successfully suspended",
+                        description = "Your suspension of `".. user.name .."` has been saved",
                         fields = {
-                            {name = "Note information",value = "``"..args[3].."``"},
+                            {name = "Suspension ends at: ",value = "<t:"..epoch..":f>"},
                         },
                     })
                 }}
@@ -207,10 +207,7 @@ function module:Init(discordia,client)
             local listId = getListId("Suspensions")
             local card = libs.trello.Cards:GetCardOnList(listId,user.name)
             if card then 
-                local updateCard = libs.trello.Cards:UpdateCard(card.id,
-                {
-                    Description = epoch
-                })
+                local updateCard = libs.trello.Cards:DeleteCard(card.id)
                 message:reply{embeds = {
                     libs.embed:verifiedEmbed({
                         authorName = "User is now unsuspended",
@@ -267,8 +264,10 @@ function module:Init(discordia,client)
             local thumbnail = libs.roblox.User:GetThumbnail(userId)
             local groupData = libs.roblox.User:GetGroupData(userId,robloxGroupId)
             local thumbnailUrl 
+            local suspendedText
             if thumbnail then thumbnailUrl = thumbnail.data[1].imageUrl print(thumbnail.data[1].imageUrl) end
             if groupData and userId and robloxGroupId then else message:reply("Group data, user id and group id are possibly nil") end
+            if suspensions then suspendedText =  "<t:"..suspensions..":f>" end
             local embed = libs.embed:informationEmbed(
                 {
                     title = "Information: ".. user.name,
@@ -281,7 +280,7 @@ function module:Init(discordia,client)
                         },
                         {
                             name = "Suspended", 
-                            value = suspensions or ":x:", --ADD A CHECK FOR SUSPENSIONS
+                            value = suspendedText or ":x:", --ADD A CHECK FOR SUSPENSIONS
                             inline = true
                         },
                         {
@@ -300,7 +299,9 @@ function module:Init(discordia,client)
             }}
         
         end
+        if args[1] == "-test" then 
 
+        end
     end) 
 end
 
