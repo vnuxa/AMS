@@ -300,7 +300,7 @@ function module:Init(discordia,client)
         
         end
         if args[1] == "-test" then 
-
+            libs.roblox.Group:TestAuth()
         end
     end) 
 end

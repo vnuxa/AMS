@@ -29,17 +29,10 @@ function module:Init(discordia,client)
         end
         return json.decode(body)
     end
-    local function getCSRF()
-        local csrf 
-        local response = urlRequest("GET","https://roblox.com/home",nil, {
-            Cookie = os.getenv("RobloxCookie")
-        }) -- obviously replace roblox.com with your proxy link
-        csrf = response:match("csrf.*data%-token.-\"(.-)\"")
-        print("CSRF Token is ", csrf)
-        return csrf
-    end
-    print(getCSRF)
+   
     function tableMerge(t1, t2)
+        t1 = t1 or {}
+        t2 = t2 or {}
         for k,v in pairs(t2) do
             if type(v) == "table" then
                 if type(t1[k] or false) == "table" then
@@ -61,6 +54,16 @@ function module:Init(discordia,client)
             return nil
         end
         return json.decode(body)
+    end
+    local function getCSRF()
+        local csrf 
+        local response,body = http.request("POST","https://auth.roblox.com/v2/logout",{Cookie = os.getenv("RobloxCookie")},json.encode({["Content-Length"] = 0}))
+        
+        print("--Getting CSRF")
+        print(response.headers)
+        print(response.headers["X-CSRF-TOKEN"])
+        print("CSRF Token is ", response.headers["X-CSRF-TOKEN"])
+        return csrf
     end
 
     function lib:GetGroupId(serverId)
@@ -98,8 +101,9 @@ function module:Init(discordia,client)
         local data = lib.User:GetGroupData()
     end
     function lib.Group:TestAuth()
-        local response = urlRequest("GET","https://users.roblox.com/v1/users/authenticated",nil,{Cookie = ".ROBLOSECURITY="+os.getenv("RobloxCookie")})
+        --local response = urlRequest("GET","https://users.roblox.com/v1/users/authenticated",nil,{Cookie = ".ROBLOSECURITY="+os.getenv("RobloxCookie")})
 
+        print(getCSRF())
     end
     function lib.Group:SetUserRank(UserID,GroupId,Rank)
 
