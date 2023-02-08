@@ -300,7 +300,53 @@ function module:Init(discordia,client)
         
         end
         if args[1] == "-test" then 
-            libs.roblox.Group:TestAuth()
+            local role = libs.roblox.Group:GetRoleFromGroup(13186189,args[2])
+            message:reply(tostring(role.name))
+        end
+        if args[1] == "-setrank" then 
+            local author = message.guild:getMember(message.author.id)
+            local member = message.mentionedUsers.first
+            --Checking HC permissions
+            if libs.user:CheckDiscordPermission(author,"hc") then else
+                message:reply{embeds = {
+                    libs.embed:errorEmbed({
+                        authorName = "Couldn't complete action",
+                        description = "You are missing `HC` permissions. If you believe this is a mistake please contact the advisory team",
+                    })
+                }}
+                return 
+            end
+            --Getting user
+            local user = libs.perms:GetUser(message,args[2])
+            if user then else 
+                message:reply{embeds = {
+                libs.embed:errorEmbed({
+                    authorName = "Couldn't complete action",
+                    description = "User `".. args[2] .."` has not been found"
+                })
+            }} return end
+            local groupId = libs.roblox:GetGroupId(message.guild.id)
+            local robloxId = libs.roblox.User:GetIDFromName(user.name)
+            if robloxId then else 
+                message:reply{embeds = {
+                    libs.embed:errorEmbed({
+                        authorName = "Couldn't complete action",
+                        description = "User `".. args[2] .."` has not been found within roblox"
+                    })
+                }} 
+            return end
+
+            local settingRank = libs.roblox.Group:SetUserRank(robloxId,groupId,args[3])
+            message:reply{embeds = {
+                libs.embed:verifiedEmbed({
+                    authorName = "User successfully suspended",
+                    description = "Your suspension of `".. user.name .."` has been saved",
+                    fields = {
+                        {name = "Suspension ends at: ",value = "<t:"..epoch..":f>"},
+                    },
+                })
+            }}
+            
         end
     end) 
 end

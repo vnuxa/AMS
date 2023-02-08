@@ -15,20 +15,6 @@ end
 
 function module:Init(discordia,client)
     local lib = {}
-    local session = {keys = 
-    {
-        Cookie = os.getenv("RobloxCookie")
-    }}
-
-    
-    local function urlRequest(method,url,body,headers,options)
-        local response,body = http.request(method,url,headers,body,options)
-        if response.code < 200 or response.code >= 300 then
-            print("Request failed, reason: " .. response.reason,body); 
-            return nil
-        end
-        return json.decode(body)
-    end
    
     function tableMerge(t1, t2)
         t1 = t1 or {}
@@ -46,25 +32,34 @@ function module:Init(discordia,client)
         end
         return t1
     end
-    function session:Request(method,url,body,headers,options)
-        local headers = tableMerge(headers,session.keys)
-        local response,body = http.request(method,url,headers,body,options)
-        if response.code < 200 or response.code >= 300 then
-            print("Request failed, reason: " .. response.reason,body); 
-            return nil
-        end
-        return json.decode(body)
-    end
-    local function getCSRF()
-        local csrf 
-        local response,body = http.request("POST","https://auth.roblox.com/v2/logout",{Cookie = os.getenv("RobloxCookie")},json.encode({["Content-Length"] = 0}))
+    local getCSRF
+    local csrf = nil
+    local request
+    local presetHeaders = {
+        ["Cookie"] = ".ROBLOSECURITY="..os.getenv("RobloxCookie"),
+        --["x-csrf-token"] = csrf
+    }
+    request = function(method,url,body,header)
+        local headers = tableMerge(header,presetHeaders)
+        local bodyMerge = tableMerge(body,{["Content-Length"] = 0})
         
-        print("--Getting CSRF")
-        print(response.headers)
-        print(response.headers["X-CSRF-TOKEN"])
-        print("CSRF Token is ", response.headers["X-CSRF-TOKEN"])
-        return csrf
+        method = string.upper(method)
+        local response,jbody1 = http.request(method,url,headers,json.encode(bodyMerge))
+        
+        local statusCode = response.StatusCode
+        if statusCode == 401 then
+            error("A valid .ROBLOSECURITY cookie is required")
+        elseif statusCode == 403 then
+            local responseHeaders = response.Headers
+            if responseHeaders["x-csrf-token"] then
+                headers["x-csrf-token"] = responseHeaders["x-csrf-token"]
+                return request(method, url, body,header)
+            end
+        end
+        return {response = response,body = json.decode(jbody1)}
+ 
     end
+  
 
     function lib:GetGroupId(serverId)
         local serverIDToRobloxID = {
@@ -96,17 +91,32 @@ function module:Init(discordia,client)
     
     lib.Group = {}
     
-    function lib.Group:GetRoleFromGroup(UserID,GroupId)
-        if UserID then else print("Put a valid ID") return nil end
-        local data = lib.User:GetGroupData()
+    function lib.Group:GetRoleFromGroup(GroupId,RoleName)
+        if GroupId then else print("Put a valid ID") return nil end
+        local rolesData = request("GET","https://groups.roblox.com/v1/groups/".. tostring(GroupId) .."/roles")
+        local roles = rolesData.body.roles
+        for i,v in pairs(roles) do 
+            if tonumber(RoleName) ~= nil then 
+                if tostring(v.rank) == RoleName then 
+                    return v 
+                end
+            else
+                print("Checking string",i,v)
+                if string.lower(v.name) == string.lower(RoleName) then 
+                    return v 
+                end
+            end
+        end
+        print("Role not found")
+        return nil
     end
-    function lib.Group:TestAuth()
-        --local response = urlRequest("GET","https://users.roblox.com/v1/users/authenticated",nil,{Cookie = ".ROBLOSECURITY="+os.getenv("RobloxCookie")})
-
-        print(getCSRF())
-    end
+    
     function lib.Group:SetUserRank(UserID,GroupId,Rank)
-
+        if GroupId and UserID then else print("Put a valid ID") return nil end
+        if Rank then else print("Put a valid rank") return nil end
+        local role = lib.Group:GetRoleFromGroup(GroupId,Rank)
+        local data = request("PATCH","https://groups.roblox.com/v1/groups/".. tostring(GroupId) .."/users/".. tostring(UserID),{["roleId"] = role.id})
+        print(data)
     end
 
     return lib
